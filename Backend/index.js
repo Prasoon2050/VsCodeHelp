@@ -39,7 +39,7 @@ const Booking = mongoose.model("Booking", bookingSchema);
 
 // POST endpoint to book a slot
 app.post("/bookSlot", async (req, res) => {
-  const { date, time, email } = req.body;
+  const { date, time, email, type } = req.body;
 
   if (!date || !time || !email) {
     return res.status(400).json({ error: "date, time and email are required" });
@@ -66,7 +66,11 @@ app.get("/bookedSlots", async (req, res) => {
 
   // Send the date and time of all booked slots as the response
   res.json(
-    bookings.map((booking) => ({ date: booking.date, time: booking.time }))
+    bookings.map((booking) => ({
+      date: booking.date,
+      time: booking.time,
+      type: booking.type,
+    }))
   );
 });
 

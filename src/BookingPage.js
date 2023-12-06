@@ -39,10 +39,7 @@ const BookingPage = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [bookedSlots, setBookedSlots] = useState([]);
-  const [slotsAvailable, setSlotsAvailable] = useState(8);
   const [activeTab, setActiveTab] = useState(0);
-
-  console.log(bookedSlots);
 
   const times_in_clinic = [
     "10:00 a.m.",
@@ -84,27 +81,38 @@ const BookingPage = () => {
   useEffect(() => {
     fetch("http://localhost:3001/bookedSlots") // replace with your API endpoint
       .then((response) => response.json())
-      .then((data) => setBookedSlots(data));
+      .then((data) => {
+        let temp_date = selectedDate;
+        let temp_type =
+          activeTab === 0 ? "In Clinic" : activeTab === 1 ? "Audio" : "Video";
+
+        const filteredSlots = data.filter((slot) => {
+          return slot.date === temp_date && slot.type === temp_type;
+        });
+        setBookedSlots(filteredSlots);
+      });
   }, []);
 
   useEffect(() => {
-    countSelectedSlots();
-  }, [selectedDate]);
+    fetch("http://localhost:3001/bookedSlots") // replace with your API endpoint
+      .then((response) => response.json())
+      .then((data) => {
+        let temp_date = selectedDate;
+        let temp_type =
+          activeTab === 0 ? "In Clinic" : activeTab === 1 ? "Audio" : "Video";
+
+        const filteredSlots = data.filter((slot) => {
+          return slot.date === temp_date && slot.type === temp_type;
+        });
+        setBookedSlots(filteredSlots);
+      });
+  }, [activeTab, selectedDate]);
 
   const isBooked = (d, t) => {
     for (let i = 0; i < bookedSlots.length; i++) {
       if (bookedSlots[i].time === t && bookedSlots[i].date === d) return true;
     }
     return false;
-  };
-
-  const countSelectedSlots = () => {
-    let counter = 0;
-    for (let i = 0; i < bookedSlots.length; i++) {
-      if (bookedSlots[i].date === selectedDate) counter++;
-    }
-
-    setSlotsAvailable(counter);
   };
 
   return (
@@ -182,7 +190,9 @@ const BookingPage = () => {
         </button>
       </div>
       <div className="text-blue-500  text-center">
-        <span className="font-bold">{timeSlots.length - slotsAvailable}</span>{" "}
+        <span className="font-bold">
+          {timeSlots.length - bookedSlots.length}
+        </span>{" "}
         slots available!
       </div>
       {selectedDate && (

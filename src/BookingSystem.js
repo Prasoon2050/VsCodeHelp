@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function BookingSystem() {
   const [email, setEmail] = useState("");
@@ -11,6 +13,7 @@ function BookingSystem() {
   const [loader, setLoader] = useState(false);
 
   const navigate = useNavigate();
+  const notify = () => toast("Booking Successful!");
 
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
@@ -54,7 +57,6 @@ function BookingSystem() {
       .then((data) => {
         console.log(data);
         if (data.status === 200) {
-          // OTP verified, now send date, time, and email to backend
           sendBookingDataToBackend();
         } else {
           alert("OTP verification failed!");
@@ -79,9 +81,10 @@ function BookingSystem() {
       .then((data) => {
         console.log(data);
         if (data.success) {
-          // alert("Booking successful!");
-          navigate("/");
-          // You can redirect to a success page or perform additional actions
+          notify();
+          setTimeout(() => {
+            navigate("/");
+          }, 4000);
         } else {
           alert("Booking failed!");
         }
@@ -168,6 +171,7 @@ function BookingSystem() {
           </button>
         </div>
       </div>
+      <ToastContainer autoClose={4000} />
     </div>
   );
 }
